@@ -178,7 +178,7 @@ const Product = () => {
                     {item.name}
                   </MenuItem>
                 ))}
-                {/* <MenuItem value={"Clothes"}>Clothes</MenuItem>
+                {/* <MenuItem value={"Clothes"}>Clothe</MenuItem>
                 <MenuItem value={"Electronics"}>Electronics</MenuItem>
                 <MenuItem value={"Furniture"}>Furniture</MenuItem>
                 <MenuItem value={"Shoes"}>Shoes</MenuItem>
@@ -226,6 +226,7 @@ const Product = () => {
         TransitionComponent={Transition}
       >
      
+
      {/* <AwesomeSlider cssModule={AwesomeSliderStyles}>
     {
         setsliderImages.map((item) => (
