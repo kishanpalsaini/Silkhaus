@@ -32,19 +32,46 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
 
-.slider-img-wrapper{
+.slider-img-wrapper {
   height: auto;
   max-width: 100%;
 }
 
 
-.slider-img-wrapper img{
+.slider-img-wrapper img {
   width: 100%;
   object-fit: cover;
+  height: calc(100vh - 150px);
+}
+
+.slick-slider {
+  height: calc(100vh - 150px);
+}
+
+.slick-arrow {
+  position: absolute;
+  /* background-color: #61dafb !important; */
+  z-index: 111 !important;
+}
+
+.slick-prev {
+  left: 15px !important;
+}
+
+.slick-next {
+  right: 15px !important;
+}
+
+.slick-list {}
+
+.slick-dots {
+  position: absolute !important;
+  bottom: 15px !important;
 }

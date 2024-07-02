@@ -24,6 +24,13 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import Badge from '@mui/material/Badge';
+import Box from '@mui/material/Box';
+
+import Drawer from '@mui/material/Drawer';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 
 import Slide from '@mui/material/Slide';
 import Slider from "react-slick";
@@ -35,10 +42,10 @@ const baseUrl = "https://api.escuelajs.co/api/v1";
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-  });
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
-  
+
 const Product = () => {
   const [productList, setProductList] = useState([]);
   const [apiData, setApiData] = useState([]);
@@ -47,8 +54,10 @@ const Product = () => {
   const [categoryValue, setCategoryValue] = useState("");
   const [dialogOpenClose, setDialogOpenClose] = React.useState(false);
   const [setsliderImages, setSetsliderImages] = useState([])
+  const [cartList, setCartList] = useState([])
+  const [drawer, setDrawer] = useState(false)
 
-  
+
   const settings = {
     dots: true,
     infinite: true,
@@ -120,9 +129,62 @@ const Product = () => {
     setDialogOpenClose(false);
   }
 
+  const hanldeAddCart = (event, item) => {
+    event.stopPropagation()
+    const temp = [...cartList]
+    const check = temp.filter(product => product.id === item.id)
+    if (!check.length) {
+      item.quantity = 1;
+      temp.push(item)
+      setCartList(temp)
+    }
+    console.log("cart :", check, cartList, temp)
+  }
+
+  const toggleDrawer = (newOpen) => () => {
+    setDrawer(newOpen);
+  };
+
+  const handleIncreaseCartQuantity = (item) => {
+    const temp = [...cartList]
+    temp.filter
+  }
+
   return (
     <div>
       <Container maxWidth="lg">
+        <div className="" style={{ textAlign: 'right' }}>
+          <Badge badgeContent={cartList.length} color="primary" sx={{ cursor: 'pointer' }} onClick={toggleDrawer(true)}>
+            <AddShoppingCartIcon />
+          </Badge>
+          <Drawer anchor="right" open={drawer} onClose={toggleDrawer(false)} sx={{ p: 3 }}>
+            <h1>kp</h1>
+
+
+          {cartList?.map((item) => (
+            <Card style={{ display: 'flex', margin: "10px", alignItems: 'center', gap: '10px' }}>
+              <div style={{ maxWidth: '80px' }}>
+                <img src="https://i.imgur.com/cHddUCu.jpeg" alt="" style={{ maxWidth: '100%' }} />
+              </div>
+              <div style={{ maxWidth: '50%' }}>
+                <h5>some produect</h5>
+                <p>Lorem ipsum dolor sit, amet consectetur adipisicing aliquid?</p>
+              </div>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <Box sx={{ padding: '5px', backgroundColor: '#ddd', borderRadius: '25px', display: 'flex', alignContent: 'center', alignItems: 'center' }} onClick={() => handleIncreaseCartQuantity(item)}>
+                  <AddIcon />
+                </Box>
+                5
+                <Box sx={{ padding: '5px', backgroundColor: '#ddd', borderRadius: '25px', display: 'flex', alignContent: 'center', alignItems: 'center' }}>
+                  <RemoveIcon />
+                </Box>
+              </div>
+            </Card>
+          ))
+          }
+
+          </Drawer>
+        </div>
         <Grid container>
           <Grid item xs={12} sm={6} sx={{ m: 2 }}>
             <Autocomplete
@@ -208,6 +270,8 @@ const Product = () => {
                     <Typography variant="body2" color="text.secondary">
                       ${item.price}
                     </Typography>
+
+                    <Button sx={{ mt: 2 }} variant="contained" onClick={(e) => hanldeAddCart(e, item)}>Add to cart</Button>
                   </CardContent>
                 </CardActionArea>
               </Card>
@@ -216,34 +280,35 @@ const Product = () => {
         </Grid>
       </Container>
 
-      
+
       <Dialog
         // fullScreen
         fullWidth
-        maxWidth="lg"
+        maxWidth="xl"
         open={dialogOpenClose}
         onClose={handleDialogClose}
         TransitionComponent={Transition}
+        style={{ overflow: "hidden" }}
       >
-     
 
-     {/* <AwesomeSlider cssModule={AwesomeSliderStyles}>
+
+        {/* <AwesomeSlider cssModule={AwesomeSliderStyles}>
     {
         setsliderImages.map((item) => (
             <div data-src={item} />
         ))
     }
   </AwesomeSlider> */}
-  
-  <Slider {...settings}>
-  {
-        setsliderImages.map((item) => (
-        <div className="slider-img-wrapper">
-            <img src={updateImgUrl(item)} />
-        </div>
-        ))
-    }
-    </Slider>
+
+        <Slider {...settings}>
+          {
+            setsliderImages.map((item) => (
+              <div className="slider-img-wrapper">
+                <img src={updateImgUrl(item)} alt="product-img" />
+              </div>
+            ))
+          }
+        </Slider>
       </Dialog>
     </div>
   );
