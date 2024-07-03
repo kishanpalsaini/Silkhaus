@@ -40,6 +40,9 @@ import "slick-carousel/slick/slick-theme.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
+
 // Kishanpal-saini
 const baseUrl = "https://api.escuelajs.co/api/v1";
 
@@ -62,6 +65,9 @@ const Product = () => {
   const [cartList, setCartList] = useState([])
   const [drawer, setDrawer] = useState(false)
   const [cartTotalPrice, setCartTotalPrice] = useState(0)
+  const [paginationCount, setPaginationCount] = useState(0)
+  const [paginationList, setPaginationList] = useState([])
+  const [paginationPerPage, setPaginationPerPage] = useState(10)
 
 
   const settings = {
@@ -76,6 +82,14 @@ const Product = () => {
     getData(`${baseUrl}/products`);
     getCategories(`${baseUrl}/categories`);
   }, []);
+
+  useEffect(() => {
+    const temp = [...productList]
+    const res = temp.slice(paginationCount,paginationCount+paginationPerPage)
+    setPaginationList(res)
+    console.log("res :", res)
+  }, [productList, paginationCount])
+  
 
   const getData = async (url) => {
     const data = await getRequest(url);
@@ -186,6 +200,12 @@ const Product = () => {
 
   const hanldeBuyCartItems = () => {
     successToaster("Order Placed")
+  }
+
+  const handlePagination = (e,page) => {
+    console.log("handlePagination e,page :", e,page)
+    const temp = (page - 1) * paginationPerPage
+    setPaginationCount(temp)
   }
 
   return (
@@ -360,7 +380,7 @@ const Product = () => {
           </Grid>
         </Grid>
         <Grid container spacing={2}>
-          {productList?.map((item) => (
+          {paginationList?.map((item) => (
             <Grid item xs={12} sm={6} md={3}>
               <Card
                 sx={{ maxWidth: 345, height: "100%" }}
@@ -397,6 +417,10 @@ const Product = () => {
             </Grid>
           ))}
         </Grid>
+        
+    <Stack spacing={2} sx={{m: 2, textAlign: "right", width: '100%'}}>
+      <Pagination sx={{marginLeft: 'auto !important'}} count={ Math.ceil(productList.length/10)} onChange={handlePagination} />
+    </Stack>
       </Container>
 
       <Dialog
