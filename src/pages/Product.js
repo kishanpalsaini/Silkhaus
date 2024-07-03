@@ -37,6 +37,9 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 // Kishanpal-saini
 const baseUrl = "https://api.escuelajs.co/api/v1";
 
@@ -45,6 +48,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+
+const successToaster = (data) => toast.success(data);
 
 const Product = () => {
   const [productList, setProductList] = useState([]);
@@ -56,6 +61,7 @@ const Product = () => {
   const [setsliderImages, setSetsliderImages] = useState([])
   const [cartList, setCartList] = useState([])
   const [drawer, setDrawer] = useState(false)
+  const [cartTotalPrice, setCartTotalPrice] = useState(0)
 
 
   const settings = {
@@ -124,6 +130,7 @@ const Product = () => {
     setSetsliderImages(cardData.images)
     console.log("setSetsliderImages ", cardData.images)
     setDialogOpenClose(true);
+    successToaster("Thank You for your interest in our product.")
   }
   const handleDialogClose = () => {
     setDialogOpenClose(false);
@@ -135,6 +142,8 @@ const Product = () => {
     const check = temp.filter(product => product.id === item.id)
     if (!check.length) {
       item.quantity = 1;
+      item.totalPrice = item.price;
+      setCartTotalPrice(cartTotalPrice + item.price)
       temp.push(item)
       setCartList(temp)
     }
@@ -147,42 +156,141 @@ const Product = () => {
 
   const handleIncreaseCartQuantity = (item) => {
     const temp = [...cartList]
-    temp.filter
+    temp.forEach(product => {
+        if(product.id === item.id){
+            product.quantity += 1;
+            product.totalPrice += product.price;
+            setCartTotalPrice(cartTotalPrice + product.price)
+        }
+    });
+        setCartList(temp)
+      console.log("handleIncreaseCartQuantity :", cartList, temp)
+  }
+
+  const handleDecreaseCartQuantity = (item) => {
+    let temp = [...cartList]
+    temp.forEach(product => {
+        if(product.id === item.id){
+            product.quantity -= 1;
+            product.totalPrice -= product.price;
+            setCartTotalPrice(cartTotalPrice - product.price)
+        }
+        if(product.quantity === 0){
+            temp = temp.filter(ele => ele.id !== product.id)
+        }
+    });
+        setCartList(temp)
+      console.log("handleDecreaseCartQuantity :", cartList, temp)
+
+  }
+
+  const hanldeBuyCartItems = () => {
+    successToaster("Order Placed")
   }
 
   return (
     <div>
       <Container maxWidth="lg">
-        <div className="" style={{ textAlign: 'right' }}>
-          <Badge badgeContent={cartList.length} color="primary" sx={{ cursor: 'pointer' }} onClick={toggleDrawer(true)}>
+        <div className="" style={{ textAlign: "right" }}>
+          <Badge
+            badgeContent={cartList.length}
+            color="primary"
+            sx={{ cursor: "pointer" }}
+            onClick={toggleDrawer(true)}
+          >
             <AddShoppingCartIcon />
           </Badge>
-          <Drawer anchor="right" open={drawer} onClose={toggleDrawer(false)} sx={{ p: 3 }}>
-            <h1>kp</h1>
+          <Drawer
+            anchor="right"
+            open={drawer}
+            onClose={toggleDrawer(false)}
+            sx={{ p: 3 }}
+          >
+            <h1 style={{ padding: "0px 10px", marginBottom: "0px" }}>
+              Cart List
+            </h1>
 
+            {cartList?.map((item) => (
+              <Card
+                style={{
+                  display: "flex",
+                  margin: "10px",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "0px 10px",
+                }}
+              >
+                <div style={{ maxWidth: "80px" }}>
+                  <img
+                    src={item.images[0]}
+                    alt=""
+                    style={{ maxWidth: "100%" }}
+                  />
+                </div>
+                <div style={{ maxWidth: "50%" }}>
+                  <h5 style={{ margin: "0px" }}>{item.title}</h5>
+                  <p style={{ margin: "0px" }}>${item.price}</p>
+                </div>
+                <div
+                  style={{ display: "flex", gap: "10px", alignItems: "center" }}
+                >
+                  <Box
+                    sx={{
+                      padding: "5px",
+                      backgroundColor: "#ddd",
+                      borderRadius: "25px",
+                      display: "flex",
+                      alignContent: "center",
+                      alignItems: "center",
+                    }}
+                    onClick={() => handleIncreaseCartQuantity(item)}
+                  >
+                    <AddIcon />
+                  </Box>
+                  {item.quantity}
+                  <Box
+                    sx={{
+                      padding: "5px",
+                      backgroundColor: "#ddd",
+                      borderRadius: "25px",
+                      display: "flex",
+                      alignContent: "center",
+                      alignItems: "center",
+                    }}
+                    onClick={() => handleDecreaseCartQuantity(item)}
+                  >
+                    <RemoveIcon />
+                  </Box>
+                </div>
 
-          {cartList?.map((item) => (
-            <Card style={{ display: 'flex', margin: "10px", alignItems: 'center', gap: '10px' }}>
-              <div style={{ maxWidth: '80px' }}>
-                <img src="https://i.imgur.com/cHddUCu.jpeg" alt="" style={{ maxWidth: '100%' }} />
-              </div>
-              <div style={{ maxWidth: '50%' }}>
-                <h5>some produect</h5>
-                <p>Lorem ipsum dolor sit, amet consectetur adipisicing aliquid?</p>
-              </div>
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <Box sx={{ padding: '5px', backgroundColor: '#ddd', borderRadius: '25px', display: 'flex', alignContent: 'center', alignItems: 'center' }} onClick={() => handleIncreaseCartQuantity(item)}>
-                  <AddIcon />
-                </Box>
-                5
-                <Box sx={{ padding: '5px', backgroundColor: '#ddd', borderRadius: '25px', display: 'flex', alignContent: 'center', alignItems: 'center' }}>
-                  <RemoveIcon />
-                </Box>
-              </div>
-            </Card>
-          ))
-          }
+                <div style={{}}>
+                  <p style={{ fontSize: "12px", margin: "0px" }}>Total Price</p>
+                  <h5 style={{ margin: "0px", textAlign: "center" }}>
+                    ${item.totalPrice}
+                  </h5>
+                </div>
+              </Card>
+            ))}
 
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "10px",
+                backgroundColor: "#ddd",
+                alignItems: 'center'
+              }}
+            >
+              <Button
+                variant="contained"
+                onClick={(e) => hanldeBuyCartItems()}
+              >
+                Buy Now
+              </Button>  
+               <h5 style={{ margin: "0px", textAlign: "center" }}>      
+               <span>Total Amount</span> ${cartTotalPrice}
+                  </h5>
+            </Box>
           </Drawer>
         </div>
         <Grid container>
@@ -235,11 +343,12 @@ const Product = () => {
                 label="Short By categories"
                 onChange={handleFilterByCategory}
               >
-                {filterByCategory.length && filterByCategory?.map((item) => (
-                  <MenuItem value={item.name} key={item.id}>
-                    {item.name}
-                  </MenuItem>
-                ))}
+                {filterByCategory.length &&
+                  filterByCategory?.map((item) => (
+                    <MenuItem value={item.name} key={item.id}>
+                      {item.name}
+                    </MenuItem>
+                  ))}
                 {/* <MenuItem value={"Clothes"}>Clothe</MenuItem>
                 <MenuItem value={"Electronics"}>Electronics</MenuItem>
                 <MenuItem value={"Furniture"}>Furniture</MenuItem>
@@ -253,7 +362,11 @@ const Product = () => {
         <Grid container spacing={2}>
           {productList?.map((item) => (
             <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{ maxWidth: 345, height: "100%" }} key={item.id} onClick={() => handleDialogOpen(item)}>
+              <Card
+                sx={{ maxWidth: 345, height: "100%" }}
+                key={item.id}
+                onClick={() => handleDialogOpen(item)}
+              >
                 <CardActionArea sx={{ height: "100%" }}>
                   <CardMedia
                     component="img"
@@ -271,7 +384,13 @@ const Product = () => {
                       ${item.price}
                     </Typography>
 
-                    <Button sx={{ mt: 2 }} variant="contained" onClick={(e) => hanldeAddCart(e, item)}>Add to cart</Button>
+                    <Button
+                      sx={{ mt: 2 }}
+                      variant="contained"
+                      onClick={(e) => hanldeAddCart(e, item)}
+                    >
+                      Add to cart
+                    </Button>
                   </CardContent>
                 </CardActionArea>
               </Card>
@@ -279,7 +398,6 @@ const Product = () => {
           ))}
         </Grid>
       </Container>
-
 
       <Dialog
         // fullScreen
@@ -290,8 +408,6 @@ const Product = () => {
         TransitionComponent={Transition}
         style={{ overflow: "hidden" }}
       >
-
-
         {/* <AwesomeSlider cssModule={AwesomeSliderStyles}>
     {
         setsliderImages.map((item) => (
@@ -301,13 +417,11 @@ const Product = () => {
   </AwesomeSlider> */}
 
         <Slider {...settings}>
-          {
-            setsliderImages.map((item) => (
-              <div className="slider-img-wrapper">
-                <img src={updateImgUrl(item)} alt="product-img" />
-              </div>
-            ))
-          }
+          {setsliderImages.map((item) => (
+            <div className="slider-img-wrapper">
+              <img src={updateImgUrl(item)} alt="product-img" />
+            </div>
+          ))}
         </Slider>
       </Dialog>
     </div>
